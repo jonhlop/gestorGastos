@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planificador de Gastos en Pareja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+
+  <!-- Encabezado -->
+  <h1 class="text-2xl font-bold text-center mb-6">Planificador de Gastos en Pareja</h1>
+
+  <!-- Contenedor principal en dos columnas -->
+  <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Bloque de Alquiler y Sueldos -->
+    <div class="bg-white p-4 rounded-lg shadow-md">
+      <div class="mb-4">
+        <label class="block font-semibold">Alquiler (€/mes):</label>
+        <input type="number" id="alquiler" class="w-full p-2 border rounded" placeholder="Introduce el alquiler">
+      </div>
+      <div class="mb-4">
+        <label class="block font-semibold">Sueldo Persona 1 (€/mes):</label>
+        <input type="number" id="sueldo1" class="w-full p-2 border rounded" placeholder="Introduce el sueldo de la Persona 1">
+      </div>
+      <div class="mb-4">
+        <label class="block font-semibold">Sueldo Persona 2 (€/mes):</label>
+        <input type="number" id="sueldo2" class="w-full p-2 border rounded" placeholder="Introduce el sueldo de la Persona 2">
+      </div>
+
+      <!-- Botón para calcular -->
+      <button onclick="calcularAportacion()" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded w-full mt-4">Calcular Aportaciones</button>
+
+      <!-- Mostrar aportaciones -->
+      <div id="aportaciones" class="mt-4 text-center font-semibold text-gray-700"></div>
+    </div>
+
+    <!-- Bloque de Agregar Gastos -->
+    <div class="bg-white p-4 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Agregar Gastos</h2>
+      <div class="mb-4">
+        <input type="text" id="nombreGasto" class="w-full p-2 border rounded mb-2" placeholder="Nombre del gasto (e.g., Luz)">
+        <input type="number" id="importeGasto" class="w-full p-2 border rounded" placeholder="Importe (€)">
+      </div>
+      <button onclick="agregarGasto()" class="bg-green-500 text-white font-semibold py-2 px-4 rounded w-full">Añadir Gasto</button>
+
+      <!-- Lista de gastos editable -->
+      <div id="listaGastos" class="mt-4 text-gray-700"></div>
+    </div>
+  </div>
+
+  <!-- Resumen de gastos en gráfico -->
+  <div class="max-w-lg mx-auto bg-white p-4 rounded-lg shadow-md mt-6">
+    <h2 class="text-xl font-semibold text-center mb-4">Resumen de Gastos</h2>
+    <canvas id="graficoGastos" width="300" height="300" class="mx-auto"></canvas>
+    <div id="leyendaGastos" class="text-center mt-4"></div>
+  </div>
+
+  <script>
+    // Inicializar datos desde localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarDatos();
+      renderizarGastos();
+    });
+
+    // Cargar datos almacenados en localStorage
+    function cargarDatos() {
+      document.getElementById('alquiler').value = localStorage.getItem('alquiler') || '';
+      document.getElementById('sueldo1').value = localStorage.getItem('sueldo1') || '';
+      document.getElementById('sueldo2').value = localStorage.getItem('sueldo2') || '';
+    }
+
+    // Guardar datos básicos en localStorage
+    function guardarDatos() {
+      localStorage.setItem('alquiler', document.getElementById('alquiler').value);
+      localStorage.setItem('sueldo1', document.getElementById('sueldo1').value);
+      localStorage.setItem('sueldo2', document.getElementById('sueldo2').value);
+    }
+
+    // Calcular la aportación de cada persona según el alquiler y sueldos
+    function calcularAportacion() {
+      const alquiler = parseFloat(document.getElementById('alquiler').value);
+      const sueldo1 = parseFloat(document.getElementById('sueldo1').value);
+      const sueldo2 = parseFloat(document.getElementById('sueldo2').value);
+
+      guardarDatos();
+
+      if (!alquiler || !sueldo1 || !sueldo2) {
+        document.getElementById('aportaciones').innerText = "Por favor, completa todos los campos.";
+        return;
+      }
+
+      const totalSueldo = sueldo1 + sueldo2;
+      const aportacion1 = ((sueldo1 / totalSueldo) * alquiler).toFixed(2);
+      const aportacion2 = ((sueldo2 / totalSueldo) * alquiler).toFixed(2);
+
+      document.getElementById('aportaciones').innerText = `Aportación Persona 1: €${aportacion1}, Aportación Persona 2: €${aportacion2}`;
+    }
+
+    // Agregar un gasto adicional a la lista y guardar en localStorage
+    function agregarGasto() {
+      const nombre = document.getElementById('nombreGasto').value;
+      const importe = parseFloat(document.getElementById('importeGasto').value);
+
+      if (!nombre || !importe) {
+        alert("Introduce un nombre y un importe válido.");
+        return;
+      }
+
+      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+      gastos.push({ nombre, importe });
+      localStorage.setItem('gastos', JSON.stringify(gastos));
+
+      renderizarGastos();
+      document.getElementById('nombreGasto').value = '';
+      document.getElementById('importeGasto').value = '';
+    }
+
+    // Editar un gasto existente
+    function editarGasto(index) {
+      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+      const gasto = gastos[index];
+      document.getElementById('nombreGasto').value = gasto.nombre;
+      document.getElementById('importeGasto').value = gasto.importe;
+      eliminarGasto(index);  // Remueve el gasto para reemplazarlo con los nuevos valores
+    }
+
+    // Eliminar un gasto de la lista
+    function eliminarGasto(index) {
+      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+      gastos.splice(index, 1);
+      localStorage.setItem('gastos', JSON.stringify(gastos));
+      renderizarGastos();
+    }
+
+    // Renderizar la lista de gastos y el gráfico
+    function renderizarGastos() {
+      const listaGastosDiv = document.getElementById('listaGastos');
+      listaGastosDiv.innerHTML = '';
+
+      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+      gastos.forEach((gasto, index) => {
+        const div = document.createElement('div');
+        div.classList = "flex justify-between items-center py-2";
+        div.innerHTML = `
+          ${gasto.nombre}: €${gasto.importe.toFixed(2)}
+          <div>
+            <button onclick="editarGasto(${index})" class="text-blue-500 mr-2">Editar</button>
+            <button onclick="eliminarGasto(${index})" class="text-red-500">Eliminar</button>
+          </div>
+        `;
+        listaGastosDiv.appendChild(div);
+      });
+
+      dibujarGrafico(gastos);
+      actualizarLeyenda(gastos);
+    }
+
+    // Dibujar gráfico circular de los gastos
+    function dibujarGrafico(gastos) {
+      const canvas = document.getElementById('graficoGastos');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const total = gastos.reduce((sum, gasto) => sum + gasto.importe, 0);
+      let startAngle = 0;
+
+      gastos.forEach(gasto => {
+        const sliceAngle = (gasto.importe / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, startAngle, startAngle + sliceAngle);
+        const color = `hsl(${Math.random() * 360}, 70%, 70%)`;
+        ctx.fillStyle = color;
+        ctx.fill();
+        gasto.color = color;  // Agregar color al gasto para la leyenda
+        startAngle += sliceAngle;
+      });
+
+      localStorage.setItem('gastos', JSON.stringify(gastos));
+    }
+
+    // Actualizar leyenda del gráfico
+    function actualizarLeyenda(gastos) {
+      const leyenda = document.getElementById('leyendaGastos');
+      leyenda.innerHTML = '';
+      gastos.forEach(gasto => {
+        const item = document.createElement('div');
+        item.className = "text-gray-700";
+        item.innerHTML = `<span style="color:${gasto.color}">⬤</span> ${gasto.nombre}: €${gasto.importe.toFixed(2)}`;
+        leyenda.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>
