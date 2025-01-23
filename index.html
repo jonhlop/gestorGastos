@@ -5,193 +5,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Planificador de Gastos en Pareja</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- FontAwesome -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js para la gráfica -->
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-gray-100 p-8">
 
-  <!-- Encabezado -->
-  <h1 class="text-2xl font-bold text-center mb-6">Planificador de Gastos en Pareja</h1>
-
-  <!-- Contenedor principal en dos columnas -->
-  <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <!-- Bloque de Alquiler y Sueldos -->
-    <div class="bg-white p-4 rounded-lg shadow-md">
-      <div class="mb-4">
-        <label class="block font-semibold">Alquiler (€/mes):</label>
-        <input type="number" id="alquiler" class="w-full p-2 border rounded" placeholder="Introduce el alquiler">
-      </div>
-      <div class="mb-4">
-        <label class="block font-semibold">Sueldo Persona 1 (€/mes):</label>
-        <input type="number" id="sueldo1" class="w-full p-2 border rounded" placeholder="Introduce el sueldo de la Persona 1">
-      </div>
-      <div class="mb-4">
-        <label class="block font-semibold">Sueldo Persona 2 (€/mes):</label>
-        <input type="number" id="sueldo2" class="w-full p-2 border rounded" placeholder="Introduce el sueldo de la Persona 2">
-      </div>
-
-      <!-- Botón para calcular -->
-      <button onclick="calcularAportacion()" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded w-full mt-4">Calcular Aportaciones</button>
-
-      <!-- Mostrar aportaciones -->
-      <div id="aportaciones" class="mt-4 text-center font-semibold text-gray-700"></div>
+  <h1 class="text-3xl font-bold text-center mb-8 text-indigo-600">Planificador de Gastos en Pareja</h1>
+  
+  <!-- Contenedor Principal -->
+  <div class="grid grid-cols-3 gap-6">
+    
+    <!-- Columna 1: Alquiler y Sueldos -->
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="font-bold text-lg mb-4">Alquiler (€/mes): 🤑</h2>
+      <input id="alquiler" type="number" placeholder="Alquiler (€)" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      
+      <h2 class="font-bold text-lg mb-4">Sueldo Persona 1 (€/mes):</h2>
+      <input id="sueldo1" type="number" placeholder="Sueldo Persona 1 (€)" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      
+      <h2 class="font-bold text-lg mb-4">Sueldo Persona 2 (€/mes):</h2>
+      <input id="sueldo2" type="number" placeholder="Sueldo Persona 2 (€)" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      
+      <button onclick="calcularAportaciones()" class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600">Calcular Aportaciones</button>
+      <p id="aportaciones" class="mt-4 font-semibold text-center text-gray-700"></p>
     </div>
 
-    <!-- Bloque de Agregar Gastos -->
-    <div class="bg-white p-4 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold mb-4">Agregar Gastos</h2>
-      <div class="mb-4">
-        <input type="text" id="nombreGasto" class="w-full p-2 border rounded mb-2" placeholder="Nombre del gasto (e.g., Luz)">
-        <input type="number" id="importeGasto" class="w-full p-2 border rounded" placeholder="Importe (€)">
-      </div>
-      <button onclick="agregarGasto()" class="bg-green-500 text-white font-semibold py-2 px-4 rounded w-full">Añadir Gasto</button>
-
-      <!-- Lista de gastos editable -->
-      <div id="listaGastos" class="mt-4 text-gray-700"></div>
+    <!-- Columna 2: Agregar Gasto o Ingreso -->
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="font-bold text-lg mb-4">Agregar Gasto o Ingreso 📝</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input id="nombreGasto" type="text" placeholder="Nombre del gasto (e.g., Luz)" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      <input id="importeGasto" type="number" placeholder="Importe (€)" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      
+      <select id="categoriaGasto" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+        <option value="casa"><i class="home"></i> Casa 🏠</option>
+        <option value="comida"><i class="utensils"></i> Comida 🍎</option>
+        <option value="internet"><i class="wifi"></i> Internet 🌐</option>
+        <option value="suministros"><i class="tint"></i> Suministros ⚡</option>
+        <option value="coche"><i class="car"></i> Coche 🚗</option>
+        <option value="transporte"><i class="bus"></i> Transporte 🚌</option>
+        <option value="ocio"><i class="music"></i> Ocio 🎉</option>
+        <option value="muebles"><i class="couch"></i> Muebles 🛋️</option>
+        <option value="consumibles"><i class="box"></i> Consumibles 🛒</option>
+      </select>
     </div>
+    
+      <input id="comentarios" type="text" placeholder="Comentarios" class="border border-gray-300 p-2 mb-4 w-full rounded-lg">
+      
+      <button onclick="agregarGasto()" class="bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600">Agregar Gasto</button>
+      <button onclick="agregarIngreso()" class="bg-green-500 text-white px-4 py-2 rounded w-full mt-4 hover:bg-green-600">Agregar Ingreso</button>
+    </div>
+
+    <!-- Columna 3: Resumen de Gastos -->
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="font-bold text-lg mb-4">Resumen de Gastos - 📊<span id="mesActual"></span></h2>
+      <canvas id="graficaGastos" class="mb-6"></canvas>
+      <p id="balanceIngresos" class="text-center text-lg font-bold text-yellow-600"></p>
+      <p id="balanceGastos" class="text-center text-lg font-bold text-red-600"></p>
+      <p id="balanceTotal" class="text-center text-lg font-bold text-blue-600"></p>
+    </div>
+
+  </div>
+  <div class="bg-white p-4 shadow rounded">
+    <h2 class="text-xl font-semibold mb-2">Resumen Gráfico 📈</h2>
+    <div class="my-4">
+      <input id="filtro" type="text" placeholder="Filtrar gastos" class="border border-gray-300 p-2 mb-4 w-full rounded-lg" oninput="filtrarGastos()">
+    </div>
+  
+    <table class="w-full border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="border p-2 text-left">Fecha</th>
+          <th class="border p-2 text-left">Nombre</th>
+          <th class="border p-2 text-left">Importe (€)</th>
+          <th class="border p-2 text-left">Categoría</th>
+          <th class="border p-2 text-left">Comentarios</th>
+          <th class="border p-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaGastos"></tbody>
+    </table>
   </div>
 
-  <!-- Resumen de gastos en gráfico -->
-  <div class="max-w-lg mx-auto bg-white p-4 rounded-lg shadow-md mt-6">
-    <h2 class="text-xl font-semibold text-center mb-4">Resumen de Gastos</h2>
-    <canvas id="graficoGastos" width="300" height="300" class="mx-auto"></canvas>
-    <div id="leyendaGastos" class="text-center mt-4"></div>
-  </div>
+ 
 
   <script>
-    // Inicializar datos desde localStorage
-    document.addEventListener("DOMContentLoaded", () => {
-      cargarDatos();
-      renderizarGastos();
-    });
+    // Variables globales
+    let gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+    let ingresos = JSON.parse(localStorage.getItem('ingresos')) || [];
+    let ahorros = { persona1: JSON.parse(localStorage.getItem('ahorros1')) || [], persona2: JSON.parse(localStorage.getItem('ahorros2')) || [] };
 
-    // Cargar datos almacenados en localStorage
-    function cargarDatos() {
-      document.getElementById('alquiler').value = localStorage.getItem('alquiler') || '';
-      document.getElementById('sueldo1').value = localStorage.getItem('sueldo1') || '';
-      document.getElementById('sueldo2').value = localStorage.getItem('sueldo2') || '';
+    // Función para mostrar el mes actual
+    function mostrarMesActual() {
+      const fecha = new Date();
+      const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const mesActual = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+      document.getElementById('mesActual').textContent = mesActual;
     }
 
-    // Guardar datos básicos en localStorage
-    function guardarDatos() {
-      localStorage.setItem('alquiler', document.getElementById('alquiler').value);
-      localStorage.setItem('sueldo1', document.getElementById('sueldo1').value);
-      localStorage.setItem('sueldo2', document.getElementById('sueldo2').value);
+    // Función para calcular los balances
+    function calcularAportaciones() {
+      const alquiler = parseFloat(document.getElementById('alquiler').value) || 0;
+      const sueldo1 = parseFloat(document.getElementById('sueldo1').value) || 0;
+      const sueldo2 = parseFloat(document.getElementById('sueldo2').value) || 0;
+      const totalSueldos = sueldo1 + sueldo2;
+      
+      const aportacion1 = (sueldo1 / totalSueldos) * alquiler;
+      const aportacion2 = (sueldo2 / totalSueldos) * alquiler;
+      document.getElementById('aportaciones').textContent = `Aportación Persona 1: €${aportacion1.toFixed(2)}, Aportación Persona 2: €${aportacion2.toFixed(2)}`;
+      
+      const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.importe, 0);
+      const totalIngresos = ingresos.reduce((sum, ingreso) => sum + ingreso.importe, 0);
+      const saldoTotal = (totalIngresos - totalGastos);
+
+      // Balance de Gastos e Ingresos
+      document.getElementById('balanceIngresos').textContent = `Ingresos Totales: €${totalIngresos.toFixed(2)}`;
+      document.getElementById('balanceGastos').textContent = `Gastos Totales: €${totalGastos.toFixed(2)}`;
+      document.getElementById('balanceTotal').textContent = `Saldo Total: €${saldoTotal.toFixed(2)}`;
+      
+      // Actualización de la gráfica
+      actualizarGrafica(totalIngresos, totalGastos);
+      actualizarTabla();
     }
 
-    // Calcular la aportación de cada persona según el alquiler y sueldos
-    function calcularAportacion() {
-      const alquiler = parseFloat(document.getElementById('alquiler').value);
-      const sueldo1 = parseFloat(document.getElementById('sueldo1').value);
-      const sueldo2 = parseFloat(document.getElementById('sueldo2').value);
-
-      guardarDatos();
-
-      if (!alquiler || !sueldo1 || !sueldo2) {
-        document.getElementById('aportaciones').innerText = "Por favor, completa todos los campos.";
-        return;
-      }
-
-      const totalSueldo = sueldo1 + sueldo2;
-      const aportacion1 = ((sueldo1 / totalSueldo) * alquiler).toFixed(2);
-      const aportacion2 = ((sueldo2 / totalSueldo) * alquiler).toFixed(2);
-
-      document.getElementById('aportaciones').innerText = `Aportación Persona 1: €${aportacion1}, Aportación Persona 2: €${aportacion2}`;
+    // Función para actualizar la gráfica
+    function actualizarGrafica(ingresosTotales, gastosTotales) {
+      const ctx = document.getElementById('graficaGastos').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Ingresos', 'Gastos'],
+          datasets: [{
+            label: 'Totales (€)',
+            data: [ingresosTotales, gastosTotales],
+            backgroundColor: ['#F1C40F', '#E74C3C'],
+            borderColor: ['#F39C12', '#C0392B'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
     }
 
-    // Agregar un gasto adicional a la lista y guardar en localStorage
+    // Función para agregar un gasto
     function agregarGasto() {
       const nombre = document.getElementById('nombreGasto').value;
-      const importe = parseFloat(document.getElementById('importeGasto').value);
+      const importe = parseFloat(document.getElementById('importeGasto').value) || 0;
+      const categoria = document.getElementById('categoriaGasto').value;
+      const comentarios = document.getElementById('comentarios').value;
+      const fecha = new Date().toLocaleDateString();
 
-      if (!nombre || !importe) {
-        alert("Introduce un nombre y un importe válido.");
-        return;
+      if (nombre && importe) {
+        gastos.push({ nombre, importe, categoria, fecha, comentarios });
+        localStorage.setItem('gastos', JSON.stringify(gastos));
+        calcularAportaciones();
       }
-
-      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
-      gastos.push({ nombre, importe });
-      localStorage.setItem('gastos', JSON.stringify(gastos));
-
-      renderizarGastos();
-      document.getElementById('nombreGasto').value = '';
-      document.getElementById('importeGasto').value = '';
     }
 
-    // Editar un gasto existente
-    function editarGasto(index) {
-      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
-      const gasto = gastos[index];
-      document.getElementById('nombreGasto').value = gasto.nombre;
-      document.getElementById('importeGasto').value = gasto.importe;
-      eliminarGasto(index);  // Remueve el gasto para reemplazarlo con los nuevos valores
+    // Función para agregar un ingreso
+    function agregarIngreso() {
+      const nombre = document.getElementById('nombreGasto').value;
+      const importe = parseFloat(document.getElementById('importeGasto').value) || 0;
+      const categoria = document.getElementById('categoriaGasto').value;
+      const comentarios = document.getElementById('comentarios').value;
+      const fecha = new Date().toLocaleDateString();
+
+      if (nombre && importe) {
+        ingresos.push({ nombre, importe, categoria, fecha, comentarios });
+        localStorage.setItem('ingresos', JSON.stringify(ingresos));
+        calcularAportaciones();
+      }
     }
 
-    // Eliminar un gasto de la lista
-    function eliminarGasto(index) {
-      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
-      gastos.splice(index, 1);
-      localStorage.setItem('gastos', JSON.stringify(gastos));
-      renderizarGastos();
+    // Función para actualizar la tabla de gastos
+    function actualizarTabla() {
+      const tablaGastos = document.getElementById('tablaGastos');
+      tablaGastos.innerHTML = gastos.concat(ingresos).map((item, index) => `
+        <tr>
+          <td class="border p-2">${item.fecha}</td>
+          <td class="border p-2">${item.nombre}</td>
+          <td class="border p-2">${item.importe.toFixed(2)}</td>
+          <td class="border p-2">${item.categoria}</td>
+          <td class="border p-2">${item.comentarios}</td>
+          <td class="border p-2"><button onclick="eliminarItem(${index})" class="text-red-500"><i class="fas fa-trash"></i> Eliminar</button></td>
+        </tr>
+      `).join('');
     }
 
-    // Renderizar la lista de gastos y el gráfico
-    function renderizarGastos() {
-      const listaGastosDiv = document.getElementById('listaGastos');
-      listaGastosDiv.innerHTML = '';
-
-      const gastos = JSON.parse(localStorage.getItem('gastos')) || [];
-      gastos.forEach((gasto, index) => {
-        const div = document.createElement('div');
-        div.classList = "flex justify-between items-center py-2";
-        div.innerHTML = `
-          ${gasto.nombre}: €${gasto.importe.toFixed(2)}
-          <div>
-            <button onclick="editarGasto(${index})" class="text-blue-500 mr-2">Editar</button>
-            <button onclick="eliminarGasto(${index})" class="text-red-500">Eliminar</button>
-          </div>
-        `;
-        listaGastosDiv.appendChild(div);
-      });
-
-      dibujarGrafico(gastos);
-      actualizarLeyenda(gastos);
+    // Función para eliminar un gasto o ingreso
+    function eliminarItem(index) {
+      if (gastos[index]) {
+        gastos.splice(index, 1);
+        localStorage.setItem('gastos', JSON.stringify(gastos));
+      } else {
+        ingresos.splice(index - gastos.length, 1);
+        localStorage.setItem('ingresos', JSON.stringify(ingresos));
+      }
+      actualizarTabla();
     }
 
-    // Dibujar gráfico circular de los gastos
-    function dibujarGrafico(gastos) {
-      const canvas = document.getElementById('graficoGastos');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const total = gastos.reduce((sum, gasto) => sum + gasto.importe, 0);
-      let startAngle = 0;
-
-      gastos.forEach(gasto => {
-        const sliceAngle = (gasto.importe / total) * 2 * Math.PI;
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, canvas.height / 2);
-        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, startAngle, startAngle + sliceAngle);
-        const color = `hsl(${Math.random() * 360}, 70%, 70%)`;
-        ctx.fillStyle = color;
-        ctx.fill();
-        gasto.color = color;  // Agregar color al gasto para la leyenda
-        startAngle += sliceAngle;
-      });
-
-      localStorage.setItem('gastos', JSON.stringify(gastos));
+    // Función para filtrar gastos e ingresos
+    function filtrarGastos() {
+      const filtro = document.getElementById('filtro').value.toLowerCase();
+      const tablaGastos = document.getElementById('tablaGastos');
+      tablaGastos.innerHTML = gastos.concat(ingresos).filter(item =>
+        item.nombre.toLowerCase().includes(filtro) ||
+        item.categoria.toLowerCase().includes(filtro) ||
+        item.comentarios.toLowerCase().includes(filtro)
+      ).map((item, index) => `
+        <tr>
+          <td class="border p-2">${item.fecha}</td>
+          <td class="border p-2">${item.nombre}</td>
+          <td class="border p-2">${item.importe.toFixed(2)}</td>
+          <td class="border p-2">${item.categoria}</td>
+          <td class="border p-2">${item.comentarios}</td>
+          <td class="border p-2"><button onclick="eliminarItem(${index})" class="text-red-500"><i class="fas fa-trash"></i> Eliminar</button></td>
+        </tr>
+      `).join('');
     }
 
-    // Actualizar leyenda del gráfico
-    function actualizarLeyenda(gastos) {
-      const leyenda = document.getElementById('leyendaGastos');
-      leyenda.innerHTML = '';
-      gastos.forEach(gasto => {
-        const item = document.createElement('div');
-        item.className = "text-gray-700";
-        item.innerHTML = `<span style="color:${gasto.color}">⬤</span> ${gasto.nombre}: €${gasto.importe.toFixed(2)}`;
-        leyenda.appendChild(item);
-      });
-    }
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+      mostrarMesActual();
+      actualizarTabla();
+      calcularAportaciones();
+    });
   </script>
 </body>
 </html>
